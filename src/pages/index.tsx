@@ -1,8 +1,9 @@
 import Head from "next/head";
 import { Inter } from "next/font/google";
-import styles from "@/styles/Home.module.css";
+import styles from "@/styles/Home.module.scss";
 import { useTodos } from "@/hooks/useTodos";
 import { Todo } from "@/components/Todo";
+import { TodoCreation } from "@/components/TodoCreation";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,10 +31,12 @@ export default function Home() {
       </Head>
       <main className={`${styles.main} ${inter.className}`}>
         <h1>Todoアプリ</h1>
-        {todos.map((todo) => (
-          <Todo key={todo.id} {...todo} />
-        ))}
-        <button>新規作成</button>
+        <div className={styles.todos}>
+          {todos.map((todo) => (
+            <Todo key={todo.id} {...todo} />
+          ))}
+        </div>
+        <TodoCreation />
       </main>
     </>
   );
