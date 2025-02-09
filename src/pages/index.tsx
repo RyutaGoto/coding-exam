@@ -13,12 +13,6 @@ export default function Home() {
 
   if (todosIsLoading) {
     return <div>Initial Loading...</div>;
-  } else if (todosIsValidating) {
-    return <div>Refreshing...</div>;
-  } else if (todosError) {
-    return <div>Failed to fetch todo lists</div>;
-  } else if (!todos || todos.length === 0) {
-    return <div>No data</div>;
   }
 
   return (
@@ -32,9 +26,10 @@ export default function Home() {
       <main className={`${styles.main} ${inter.className}`}>
         <h1>Todoアプリ</h1>
         <div className={styles.todos}>
-          {todos.map((todo) => (
-            <Todo key={todo.id} {...todo} />
-          ))}
+          {todosIsValidating && <p>Refreshing...</p>}
+          {todosError && <p>Failed to fetch todo lists</p>}
+          {!todos || (todos.length === 0 && <p>No data</p>)}
+          {todos && todos.map((todo) => <Todo key={todo.id} {...todo} />)}
         </div>
         <TodoCreation />
       </main>
