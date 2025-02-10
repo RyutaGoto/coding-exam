@@ -1,11 +1,7 @@
-import { ChangeEvent, FormEvent, useMemo, useState } from "react";
 import type { TodoType } from "@/schema";
-import { useTodos } from "@/hooks/useTodos";
 import { Button, Checkbox, Flex, Grid } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
-import { useDisclosure } from "@mantine/hooks";
 import { TodoEditModal } from "../TodoEditModal";
-import { useTodoItem } from "@/hooks/useTodoItem";
+import { useTodoItem } from "@/components/TodoItem/hooks";
 
 /**
  * TodoItemコンポーネントは、タスクの表示、編集、完了状態の切り替え、削除を行うUIコンポーネントです。
