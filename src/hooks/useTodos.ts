@@ -37,7 +37,10 @@ const updateTodo = async (url: string, { arg }: { arg: TodoType }) => {
   return data;
 };
 
-const deleteTodo = async (url: string, { arg }: { arg: TodoType }) => {
+const deleteTodo = async (
+  url: string,
+  { arg }: { arg: Pick<TodoType, "id"> }
+) => {
   const { id } = arg;
   const res = await fetch(`${url}/${id}`, {
     method: "DELETE",
@@ -58,13 +61,11 @@ export const useTodos = () => {
   );
   const { trigger: triggerUpdate, isMutating: isUpdating } = useSWRMutation(
     url,
-    updateTodo,
-    {}
+    updateTodo
   );
   const { trigger: triggerDelete, isMutating: isDeleting } = useSWRMutation(
     url,
-    deleteTodo,
-    {}
+    deleteTodo
   );
 
   return {
