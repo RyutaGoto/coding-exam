@@ -7,7 +7,19 @@ type DialogProps = {
   children: ReactNode;
 };
 
-// react19への移行に伴い、forwardRefを廃止して修正する必要がある
+/**
+ * Dialogコンポーネントは、モーダルダイアログを表示するためのコンポーネントです。
+ * forwardRefを使用しているため、react19への移行に伴い修正が必要です。(https://ja.react.dev/reference/react/forwardRef)
+ *
+ * @param title - ダイアログのタイトル。
+ * @param onClose - ダイアログを閉じるためのコールバック関数。
+ * @param children - ダイアログ内に表示するコンテンツ。
+ *
+ * @example
+ * <Dialog title="Dialog Title" onClose={() => console.log("Dialog closed!")}>
+ *   <p>Dialog content goes here...</p>
+ * </Dialog>
+ */
 export const Dialog = forwardRef<HTMLDialogElement, DialogProps>(
   ({ title, onClose, children }, ref) => {
     return (

@@ -5,7 +5,16 @@ type ToastProps = {
   message: string;
 };
 
-// react19への移行に伴い、forwardRefを廃止して修正する必要がある
+/**
+ * Toastコンポーネントは、ユーザーにメッセージを表示するためのコンポーネントです。
+ *
+ * forwardRefを使用しているため、react19への移行に伴い修正が必要です。(https://ja.react.dev/reference/react/forwardRef)
+ *
+ * @param message - 表示するメッセージ。
+ *
+ * @example
+ * <Toast message="This is a toast message!" />
+ */
 export const Toast = forwardRef<HTMLDialogElement, ToastProps>(
   ({ message }, ref) => {
     return (

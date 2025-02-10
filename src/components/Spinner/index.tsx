@@ -4,6 +4,16 @@ type SpinnerProps = {
   isShow: boolean;
   label?: string;
 };
+
+/**
+ * Spinnerコンポーネントは、ローディングスピナーを表示するためのコンポーネントです。
+ *
+ * @param isShow - スピナーを表示するかどうかのフラグ。
+ * @param label - スピナーの隣に表示するラベル。
+ *
+ * @example
+ * <Spinner isShow={true} label="Loading..." />
+ */
 export const Spinner = ({ isShow, label }: SpinnerProps) => {
   return (
     <div

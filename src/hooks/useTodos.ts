@@ -52,6 +52,21 @@ const deleteTodo = async (
   return data;
 };
 
+/**
+ * Todoリストを取得、作成、更新、削除するためのカスタムフックです。
+ * @returns {
+ *   todos - Todoリストのデータ。
+ *   todosError - Todoリスト取得時のエラー。
+ *   todosIsValidating - Todoリスト取得中かどうかのフラグ。
+ *   triggerCreate - Todoを作成するための関数。
+ *   isCreating - Todoを作成中かどうかのフラグ。
+ *   triggerUpdate - Todoを更新するための関数。
+ *   isUpdating - Todoを更新中かどうかのフラグ。
+ *   triggerDelete - Todoを削除するための関数。
+ *   isDeleting - Todoを削除中かどうかのフラグ。
+ *  }
+ *
+ */
 export const useTodos = () => {
   const url = "/api/todos";
   const { data, error, isValidating } = useSWR<TodoType[]>(url, fetcher);
