@@ -1,13 +1,19 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import db from "@/database/db";
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   const { id } = req.query;
 
+  await new Promise((resolve) => setTimeout(resolve, 1000));
   switch (req.method) {
     case "PUT": {
       const { title, completed } = req.body;
 
+      // res.status(400).json({ error: "test error" });
+      // return;
       if (!title && completed === undefined) {
         res.status(400).json({
           error: "At least one of title or completed must be provided",
@@ -47,6 +53,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       break;
     }
     case "DELETE": {
+      // res.status(400).json({ error: "test error" });
+      // return;
       if (!id) {
         res.status(400).json({ error: "ID is required" });
         return;
