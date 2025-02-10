@@ -1,8 +1,5 @@
-import { ChangeEvent, FormEvent, useMemo, useState } from "react";
-import { useTodos } from "@/hooks/useTodos";
-import { notifications } from "@mantine/notifications";
 import { Button, Flex, LoadingOverlay, Modal, TextInput } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { useTodoCreation } from "./hooks";
 
 /**
  * TodoCreationコンポーネントは、新しいタスクの作成を行うためのUIコンポーネントです。
@@ -13,34 +10,19 @@ import { useDisclosure } from "@mantine/hooks";
  * - エラーメッセージ表示: 作成失敗時にエラーメッセージを表示します。
  */
 export const TodoCreation = () => {
-  const [title, setTitle] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isModalOpen, { open: openModal, close: closeModal }] =
-    useDisclosure(false);
-  const { triggerCreate, isCreating } = useTodos();
+  const {
+    title,
+    errorMessage,
+    isModalOpen,
+    isCreating,
+    openModal,
+    closeModal,
+    handleTitleChange,
+    handleSubmit,
+    handleClickCancel,
+  } = useTodoCreation();
+
   const isDisabledClickSubmit = title === "" || isCreating;
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    try {
-      await triggerCreate({ title });
-      notifications.show({ message: "タスクを作成しました" });
-      setTitle("");
-      closeModal();
-    } catch (error) {
-      setErrorMessage("タスクの作成に失敗しました");
-    } finally {
-    }
-  };
-
-  const handleCancel = () => {
-    setTitle("");
-    closeModal();
-  };
-
-  const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setTitle(event.target.value);
-  };
 
   return (
     <>
@@ -54,7 +36,7 @@ export const TodoCreation = () => {
             onChange={handleTitleChange}
           />
           <Flex gap={8} justify="end" mt={24}>
-            <Button type="button" onClick={handleCancel} variant="outline">
+            <Button type="button" onClick={handleClickCancel} variant="outline">
               キャンセル
             </Button>
             <Button type="submit" disabled={isDisabledClickSubmit}>
