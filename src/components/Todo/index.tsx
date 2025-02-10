@@ -1,43 +1,11 @@
 import { useDialog } from "@/hooks/useDialog";
 import styles from "./styles.module.scss";
 import { Dialog } from "../Dialog";
-import useSWRMutation from "swr/mutation";
 import { ChangeEvent, FormEvent, useMemo, useState } from "react";
 import { useToast } from "@/hooks/useToast";
 import { Toast } from "../Toast";
 import type { TodoType } from "@/schema";
-
-const updateTodo = async (url: string, { arg }: { arg: TodoType }) => {
-  const { id, title, completed } = arg;
-  const requestBody = JSON.stringify({
-    title: title,
-    completed: completed === 1, // api側からnumberとして返ってくるが、リクエストの際はbooleanで送る
-  });
-  const res = await fetch(`${url}/${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: requestBody,
-  });
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data.error);
-  }
-  return data;
-};
-
-const deleteTodo = async (url: string, { arg }: { arg: TodoType }) => {
-  const { id } = arg;
-  const res = await fetch(`${url}/${id}`, {
-    method: "DELETE",
-  });
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data.error);
-  }
-  return data;
-};
+import { useTodos } from "@/hooks/useTodos";
 
 export const Todo = ({ id, title, completed }: TodoType) => {
   const [titleState, setTitleState] = useState(title);
@@ -45,17 +13,7 @@ export const Todo = ({ id, title, completed }: TodoType) => {
   const [errorMessage, setErrorMessage] = useState("");
   const { dialogRef, showDialog, closeDialog } = useDialog();
   const { toastRef, showToast } = useToast();
-
-  const { trigger: triggerUpdate, isMutating: isUpdating } = useSWRMutation(
-    `api/todos`,
-    updateTodo,
-    {}
-  );
-  const { trigger: triggerDelete, isMutating: isDeleting } = useSWRMutation(
-    `api/todos`,
-    deleteTodo,
-    {}
-  );
+  const { triggerUpdate, triggerDelete, isUpdating, isDeleting } = useTodos();
   const isDisabledClickSubmit = useMemo(
     () => title === "" || isUpdating,
     [title, isUpdating]
