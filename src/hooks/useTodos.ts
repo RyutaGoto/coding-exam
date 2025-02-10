@@ -1,10 +1,10 @@
 import useSWR from "swr";
 import { fetcher } from "../fetcher";
-import { Todo } from "@/schema";
+import { TodoType } from "@/schema";
 
 export const useTodos = () => {
   const url = "api/todos";
-  const { data, error, isLoading, isValidating, mutate } = useSWR<Todo[]>(
+  const { data, error, isLoading, isValidating, mutate } = useSWR<TodoType[]>(
     url,
     fetcher
   );

@@ -6,4 +6,4 @@ export const TodoSchema = z.object({
   completed: z.number(), // 0(false) or 1(true)
 });
 
-export type Todo = z.infer<typeof TodoSchema>;
+export type TodoType = z.infer<typeof TodoSchema>;
