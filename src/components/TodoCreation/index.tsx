@@ -4,6 +4,10 @@ import { ChangeEvent, FormEvent, useMemo, useState } from "react";
 import { useToast } from "@/hooks/useToast";
 import { Toast } from "../Toast";
 import { useTodos } from "@/hooks/useTodos";
+import styles from "./styles.module.scss";
+import { Button } from "../Button";
+import { TextInput } from "../TextInput";
+import { Spinner } from "../Spinner";
 
 export const TodoCreation = () => {
   const [title, setTitle] = useState("");
@@ -41,24 +45,40 @@ export const TodoCreation = () => {
 
   return (
     <>
-      <button onClick={showDialog}>新規作成</button>
+      <Button onClick={showDialog} className={styles.create}>
+        新規作成
+      </Button>
       <Dialog title="新規作成" ref={dialogRef} onClose={closeDialog}>
-        {isCreating && <p>作成中...</p>}
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className={styles.form}>
           <label htmlFor="title">タイトル</label>
-          <input
-            type="text"
+          <TextInput
             id="title"
             name="title"
             value={title}
             onChange={handleChange}
           />
-          <button type="button" onClick={handleCandel}>
-            キャンセル
-          </button>
-          <button type="submit" disabled={isDisabledClickSubmit}>
-            作成
-          </button>
+          <div className={styles.buttons}>
+            <Button
+              type="button"
+              onClick={handleCandel}
+              className={styles.cancel}
+            >
+              キャンセル
+            </Button>
+            <Button
+              type="submit"
+              disabled={isDisabledClickSubmit}
+              className={styles.submit}
+            >
+              {isCreating ? (
+                <div>
+                  <Spinner isShow={isCreating} label="作成中..." />
+                </div>
+              ) : (
+                "作成"
+              )}
+            </Button>
+          </div>
         </form>
       </Dialog>
       <Toast ref={toastRef} message={toastMessage} />
