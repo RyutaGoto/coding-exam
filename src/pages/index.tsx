@@ -1,7 +1,7 @@
 import Head from "next/head";
 import { Inter } from "next/font/google";
 import { useTodos } from "@/hooks/useTodos";
-import { Todo } from "@/components/Todo";
+import { TodoItem } from "@/components/TodoItem";
 import { TodoCreation } from "@/components/TodoCreation";
 import { Flex, Loader, Stack } from "@mantine/core";
 
@@ -44,7 +44,7 @@ export default function Home() {
           <Stack w="100%" my={10} mx="auto">
             {todosError && <p>エラーが発生しました</p>}
             {!todos || (todos.length === 0 && <p>タスクなし</p>)}
-            {todos && todos.map((todo) => <Todo key={todo.id} {...todo} />)}
+            {todos && todos.map((todo) => <TodoItem key={todo.id} {...todo} />)}
           </Stack>
         </Stack>
       </main>
