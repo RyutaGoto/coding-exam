@@ -35,11 +35,11 @@ export const Todo = ({ id, title, completed }: TodoType) => {
           ),
         }
       );
-      setToastMessage("タスクを作成しました");
+      setToastMessage("タスクを更新しました");
       showToast();
       closeDialog();
     } catch (error) {
-      setErrorMessage("タスクの作成に失敗しました");
+      setErrorMessage("タスクの更新に失敗しました");
     }
   };
 
@@ -115,7 +115,6 @@ export const Todo = ({ id, title, completed }: TodoType) => {
             value={titleState}
             onChange={handleChangeTitle}
           />
-          {errorMessage && <p>{errorMessage}</p>}
           <div className={styles.spinnerWrapper}></div>
           <div className={styles.buttons}>
             <Button type="button" onClick={handleCandel}>
@@ -137,6 +136,7 @@ export const Todo = ({ id, title, completed }: TodoType) => {
             </Button>
           </div>
         </form>
+        {errorMessage && <p>{errorMessage}</p>}
       </Dialog>
       <Toast ref={toastRef} message={toastMessage} />
     </>
