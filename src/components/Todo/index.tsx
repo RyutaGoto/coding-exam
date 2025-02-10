@@ -6,8 +6,6 @@ import { ChangeEvent, FormEvent, useMemo, useState } from "react";
 import { useToast } from "@/hooks/useToast";
 import { Toast } from "../Toast";
 import type { TodoType } from "@/schema";
-import { useTodos } from "@/hooks/useTodos";
-import { useSWRConfig } from "swr";
 
 const updateTodo = async (url: string, { arg }: { arg: TodoType }) => {
   const { id, title, completed } = arg;
@@ -29,6 +27,18 @@ const updateTodo = async (url: string, { arg }: { arg: TodoType }) => {
   return data;
 };
 
+const deleteTodo = async (url: string, { arg }: { arg: TodoType }) => {
+  const { id } = arg;
+  const res = await fetch(`${url}/${id}`, {
+    method: "DELETE",
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error);
+  }
+  return data;
+};
+
 export const Todo = ({ id, title, completed }: TodoType) => {
   const [titleState, setTitleState] = useState(title);
   const [toastMessage, setToastMessage] = useState("");
@@ -36,19 +46,25 @@ export const Todo = ({ id, title, completed }: TodoType) => {
   const { dialogRef, showDialog, closeDialog } = useDialog();
   const { toastRef, showToast } = useToast();
 
-  const { trigger, isMutating } = useSWRMutation(`api/todos`, updateTodo, {
-    rollbackOnError: true,
-    populateCache: true,
-  });
+  const { trigger: triggerUpdate, isMutating: isUpdating } = useSWRMutation(
+    `api/todos`,
+    updateTodo,
+    {}
+  );
+  const { trigger: triggerDelete, isMutating: isDeleting } = useSWRMutation(
+    `api/todos`,
+    deleteTodo,
+    {}
+  );
   const isDisabledClickSubmit = useMemo(
-    () => title === "" || isMutating,
-    [title, isMutating]
+    () => title === "" || isUpdating,
+    [title, isUpdating]
   );
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      await trigger({ id, title: titleState, completed: completed });
+      await triggerUpdate({ id, title: titleState, completed: completed });
       setToastMessage("タスクを作成しました");
       showToast();
       closeDialog();
@@ -71,11 +87,22 @@ export const Todo = ({ id, title, completed }: TodoType) => {
     // 0(false) or 1(true)をトグルする
     const newCompleted = completed === 1 ? 0 : 1;
     try {
-      await trigger({ id, title, completed: newCompleted });
+      await triggerUpdate({ id, title, completed: newCompleted });
       setToastMessage("タスクを更新しました");
       showToast();
     } catch (error) {
       setToastMessage("タスクの更新に失敗しました");
+      showToast();
+    }
+  };
+
+  const handleClickDelete = async () => {
+    try {
+      await triggerDelete({ id, title, completed });
+      setToastMessage("タスクを削除しました");
+      showToast();
+    } catch (error) {
+      setToastMessage("タスクの削除に失敗しました");
       showToast();
     }
   };
@@ -95,11 +122,17 @@ export const Todo = ({ id, title, completed }: TodoType) => {
           <button className={styles.button} onClick={showDialog}>
             編集
           </button>
-          <button className={styles.button}>削除</button>
+          <button
+            className={styles.button}
+            onClick={handleClickDelete}
+            disabled={isDeleting}
+          >
+            削除
+          </button>
         </div>
       </div>
       <Dialog title="編集" ref={dialogRef} onClose={closeDialog}>
-        {isMutating && <p>更新中...</p>}
+        {isUpdating && <p>更新中...</p>}
         <form onSubmit={handleSubmit}>
           <label htmlFor="title">タイトル</label>
           <input
