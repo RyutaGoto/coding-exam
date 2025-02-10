@@ -5,38 +5,41 @@ import useSWRMutation from "swr/mutation";
 import { ChangeEvent, FormEvent, useMemo, useState } from "react";
 import { useToast } from "@/hooks/useToast";
 import { Toast } from "../Toast";
+import type { TodoType } from "@/schema";
+import { useTodos } from "@/hooks/useTodos";
+import { useSWRConfig } from "swr";
 
-type TodoProps = {
-  id: number;
-  title: string;
-  completed: number;
-};
-
-const updateTodo = async (
-  url: string,
-  { arg }: { arg: { id: number; title: string; completed: boolean } }
-) => {
+const updateTodo = async (url: string, { arg }: { arg: TodoType }) => {
   const { id, title, completed } = arg;
-  try {
-    await fetch(`${url}/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ title: title, completed: completed }),
-    });
-  } catch (error) {
-    console.error(error);
+  const requestBody = JSON.stringify({
+    title: title,
+    completed: completed === 1, // api側からnumberとして返ってくるが、リクエストの際はbooleanで送る
+  });
+  const res = await fetch(`${url}/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: requestBody,
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error);
   }
+  return data;
 };
 
-export const Todo = ({ id, title, completed }: TodoProps) => {
+export const Todo = ({ id, title, completed }: TodoType) => {
   const [titleState, setTitleState] = useState(title);
   const [toastMessage, setToastMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const { dialogRef, showDialog, closeDialog } = useDialog();
   const { toastRef, showToast } = useToast();
-  const { trigger, isMutating } = useSWRMutation(`api/todos`, updateTodo);
+
+  const { trigger, isMutating } = useSWRMutation(`api/todos`, updateTodo, {
+    rollbackOnError: true,
+    populateCache: true,
+  });
   const isDisabledClickSubmit = useMemo(
     () => title === "" || isMutating,
     [title, isMutating]
@@ -45,13 +48,12 @@ export const Todo = ({ id, title, completed }: TodoProps) => {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      await trigger({ id, title: titleState, completed: completed === 1 });
+      await trigger({ id, title: titleState, completed: completed });
       setToastMessage("タスクを作成しました");
       showToast();
       closeDialog();
     } catch (error) {
       setErrorMessage("タスクの作成に失敗しました");
-      showToast();
     }
   };
 
@@ -59,8 +61,23 @@ export const Todo = ({ id, title, completed }: TodoProps) => {
     closeDialog();
   };
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleChangeTitle = (event: ChangeEvent<HTMLInputElement>) => {
     setTitleState(event.target.value);
+  };
+
+  const handleChangeCompleted = async (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
+    // 0(false) or 1(true)をトグルする
+    const newCompleted = completed === 1 ? 0 : 1;
+    try {
+      await trigger({ id, title, completed: newCompleted });
+      setToastMessage("タスクを更新しました");
+      showToast();
+    } catch (error) {
+      setToastMessage("タスクの更新に失敗しました");
+      showToast();
+    }
   };
 
   return (
@@ -69,7 +86,9 @@ export const Todo = ({ id, title, completed }: TodoProps) => {
         <input
           className={styles.checkbox}
           type="checkbox"
+          checked={completed === 1}
           defaultChecked={completed === 1}
+          onChange={handleChangeCompleted}
         />
         <span className={styles.title}>{title}</span>
         <div className={styles.buttons}>
@@ -87,7 +106,7 @@ export const Todo = ({ id, title, completed }: TodoProps) => {
             type="text"
             id="title"
             value={titleState}
-            onChange={handleChange}
+            onChange={handleChangeTitle}
           />
           <button type="button" onClick={handleCandel}>
             キャンセル
