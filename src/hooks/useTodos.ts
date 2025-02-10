@@ -2,19 +2,24 @@ import useSWR from "swr";
 import { fetcher } from "../fetcher";
 import { TodoType } from "@/schema";
 import useSWRMutation from "swr/mutation";
+import { delay } from "@/utils/delay";
+
+const delayTime = 500;
 
 const createTodo = async (url: string, { arg }: { arg: { title: string } }) => {
-  try {
-    await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ title: arg.title }),
-    });
-  } catch (error) {
-    console.error(error);
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ title: arg.title }),
+  });
+  const data = await res.json();
+  await delay(delayTime);
+  if (!res.ok) {
+    throw new Error(data.error);
   }
+  return data;
 };
 
 const updateTodo = async (url: string, { arg }: { arg: TodoType }) => {
@@ -31,6 +36,7 @@ const updateTodo = async (url: string, { arg }: { arg: TodoType }) => {
     body: requestBody,
   });
   const data = await res.json();
+  await delay(delayTime);
   if (!res.ok) {
     throw new Error(data.error);
   }
@@ -46,6 +52,7 @@ const deleteTodo = async (
     method: "DELETE",
   });
   const data = await res.json();
+  await delay(delayTime);
   if (!res.ok) {
     throw new Error(data.error);
   }
