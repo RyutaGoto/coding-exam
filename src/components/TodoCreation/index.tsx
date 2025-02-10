@@ -12,6 +12,7 @@ import { Spinner } from "../Spinner";
 export const TodoCreation = () => {
   const [title, setTitle] = useState("");
   const [toastMessage, setToastMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const { dialogRef, showDialog, closeDialog } = useDialog();
   const { toastRef, showToast } = useToast();
   const { triggerCreate, isCreating } = useTodos();
@@ -29,8 +30,7 @@ export const TodoCreation = () => {
       showToast();
       closeDialog();
     } catch (error) {
-      setToastMessage("タスクの作成に失敗しました");
-      showToast();
+      setErrorMessage("タスクの作成に失敗しました");
     }
   };
 
@@ -80,6 +80,7 @@ export const TodoCreation = () => {
             </Button>
           </div>
         </form>
+        {errorMessage && <p>{errorMessage}</p>}
       </Dialog>
       <Toast ref={toastRef} message={toastMessage} />
     </>
