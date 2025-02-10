@@ -8,7 +8,7 @@ export const useToast = () => {
       toastRef.current.showModal();
       setTimeout(() => {
         toastRef.current?.close();
-      }, 3000);
+      }, 1500);
     }
   }, []);
 
