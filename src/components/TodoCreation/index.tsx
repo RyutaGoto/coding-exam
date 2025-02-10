@@ -1,20 +1,15 @@
-import { useDialog } from "@/hooks/useDialog";
-import { Dialog } from "../Dialog";
 import { ChangeEvent, FormEvent, useMemo, useState } from "react";
-import { useToast } from "@/hooks/useToast";
-import { Toast } from "../Toast";
 import { useTodos } from "@/hooks/useTodos";
-import styles from "./styles.module.scss";
-import { Button } from "../Button";
-import { TextInput } from "../TextInput";
-import { Spinner } from "../Spinner";
+import { notifications } from "@mantine/notifications";
+import { Button, Flex, LoadingOverlay, Modal, TextInput } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 
 export const TodoCreation = () => {
   const [title, setTitle] = useState("");
-  const [toastMessage, setToastMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const { dialogRef, showDialog, closeDialog } = useDialog();
-  const { toastRef, showToast } = useToast();
+  const [opened, { open: openModal, close: closeModal }] = useDisclosure(false);
+  const [visible, { open: openLoader, close: closeLoader }] =
+    useDisclosure(false);
   const { triggerCreate, isCreating } = useTodos();
   const isDisabledClickSubmit = useMemo(
     () => title === "" || isCreating,
@@ -24,19 +19,21 @@ export const TodoCreation = () => {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
+      openLoader();
       await triggerCreate({ title });
+      notifications.show({ message: "タスクを作成しました" });
       setTitle("");
-      setToastMessage("タスクを作成しました");
-      showToast();
-      closeDialog();
+      closeModal();
     } catch (error) {
       setErrorMessage("タスクの作成に失敗しました");
+    } finally {
+      closeLoader();
     }
   };
 
-  const handleCandel = () => {
+  const handleCancel = () => {
     setTitle("");
-    closeDialog();
+    closeModal();
   };
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -45,44 +42,22 @@ export const TodoCreation = () => {
 
   return (
     <>
-      <Button onClick={showDialog} className={styles.create}>
-        新規作成
-      </Button>
-      <Dialog title="新規作成" ref={dialogRef} onClose={closeDialog}>
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <label htmlFor="title">タイトル</label>
-          <TextInput
-            id="title"
-            name="title"
-            value={title}
-            onChange={handleChange}
-          />
-          <div className={styles.buttons}>
-            <Button
-              type="button"
-              onClick={handleCandel}
-              className={styles.cancel}
-            >
+      <Button onClick={openModal}>新規作成</Button>
+      <Modal opened={opened} onClose={closeModal} title="新規作成">
+        <LoadingOverlay visible={visible} />
+        <form onSubmit={handleSubmit}>
+          <TextInput label="タイトル" value={title} onChange={handleChange} />
+          <Flex gap={8} justify="end" mt={24}>
+            <Button type="button" onClick={handleCancel} variant="outline">
               キャンセル
             </Button>
-            <Button
-              type="submit"
-              disabled={isDisabledClickSubmit}
-              className={styles.submit}
-            >
-              {isCreating ? (
-                <div>
-                  <Spinner isShow={isCreating} label="作成中..." />
-                </div>
-              ) : (
-                "作成"
-              )}
+            <Button type="submit" disabled={isDisabledClickSubmit}>
+              作成
             </Button>
-          </div>
+          </Flex>
         </form>
         {errorMessage && <p>{errorMessage}</p>}
-      </Dialog>
-      <Toast ref={toastRef} message={toastMessage} />
+      </Modal>{" "}
     </>
   );
 };
