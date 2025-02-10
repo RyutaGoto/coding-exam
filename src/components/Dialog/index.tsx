@@ -12,9 +12,10 @@ export const Dialog = forwardRef<HTMLDialogElement, DialogProps>(
   ({ title, onClose, children }, ref) => {
     return (
       <dialog ref={ref} className={styles.dialog} onClick={onClose}>
-        <h2>{title}</h2>
-        <button onClick={onClose}>閉じる</button>
-        <div onClick={(e) => e.stopPropagation()}>{children}</div>
+        <h2 className={styles.title}>{title}</h2>
+        <div onClick={(e) => e.stopPropagation()} className={styles.content}>
+          {children}
+        </div>
       </dialog>
     );
   }
