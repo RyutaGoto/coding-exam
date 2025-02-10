@@ -4,6 +4,7 @@ import styles from "@/styles/Home.module.scss";
 import { useTodos } from "@/hooks/useTodos";
 import { Todo } from "@/components/Todo";
 import { TodoCreation } from "@/components/TodoCreation";
+import { Spinner } from "@/components/Spinner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,12 +22,16 @@ export default function Home() {
       <main className={`${styles.main} ${inter.className}`}>
         <h1>Todoアプリ</h1>
         <div className={styles.todos}>
-          {todosIsValidating && <p>Refreshing...</p>}
           {todosError && <p>Failed to fetch todo lists</p>}
           {!todos || (todos.length === 0 && <p>No data</p>)}
           {todos && todos.map((todo) => <Todo key={todo.id} {...todo} />)}
         </div>
-        <TodoCreation />
+        <div className={styles.creation}>
+          <TodoCreation />
+        </div>
+        <div className={styles.spinnerWrapper}>
+          <Spinner isShow={todosIsValidating} label="Refreshing..." />
+        </div>
       </main>
     </>
   );
