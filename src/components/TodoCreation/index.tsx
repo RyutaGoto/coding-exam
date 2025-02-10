@@ -4,22 +4,25 @@ import { notifications } from "@mantine/notifications";
 import { Button, Flex, LoadingOverlay, Modal, TextInput } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
+/**
+ * TodoCreationコンポーネントは、新しいタスクの作成を行うためのUIコンポーネントです。
+ *
+ * @remarks
+ * このコンポーネントでは以下の機能が提供されます:
+ * - 新規タスクの作成: テキスト入力欄にタスクのタイトルを入力、更新ボタンによって新しいタスクを作成します。
+ * - エラーメッセージ表示: 作成失敗時にエラーメッセージを表示します。
+ */
 export const TodoCreation = () => {
   const [title, setTitle] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [opened, { open: openModal, close: closeModal }] = useDisclosure(false);
-  const [visible, { open: openLoader, close: closeLoader }] =
+  const [isModalOpen, { open: openModal, close: closeModal }] =
     useDisclosure(false);
   const { triggerCreate, isCreating } = useTodos();
-  const isDisabledClickSubmit = useMemo(
-    () => title === "" || isCreating,
-    [title, isCreating]
-  );
+  const isDisabledClickSubmit = title === "" || isCreating;
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      openLoader();
       await triggerCreate({ title });
       notifications.show({ message: "タスクを作成しました" });
       setTitle("");
@@ -27,7 +30,6 @@ export const TodoCreation = () => {
     } catch (error) {
       setErrorMessage("タスクの作成に失敗しました");
     } finally {
-      closeLoader();
     }
   };
 
@@ -36,17 +38,21 @@ export const TodoCreation = () => {
     closeModal();
   };
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setTitle(event.target.value);
   };
 
   return (
     <>
       <Button onClick={openModal}>新規作成</Button>
-      <Modal opened={opened} onClose={closeModal} title="新規作成">
-        <LoadingOverlay visible={visible} />
+      <Modal opened={isModalOpen} onClose={closeModal} title="新規作成">
+        <LoadingOverlay visible={isCreating} />
         <form onSubmit={handleSubmit}>
-          <TextInput label="タイトル" value={title} onChange={handleChange} />
+          <TextInput
+            label="タイトル"
+            value={title}
+            onChange={handleTitleChange}
+          />
           <Flex gap={8} justify="end" mt={24}>
             <Button type="button" onClick={handleCancel} variant="outline">
               キャンセル
@@ -57,7 +63,7 @@ export const TodoCreation = () => {
           </Flex>
         </form>
         {errorMessage && <p>{errorMessage}</p>}
-      </Modal>{" "}
+      </Modal>
     </>
   );
 };
