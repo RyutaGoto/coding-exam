@@ -1,11 +1,11 @@
 .main {
+  align-items: flex-start;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 3rem;
-  min-height: 100vh;
-  max-width: 600px;
   margin: 0 auto;
+  max-width: 600px;
+  min-height: 100vh;
+  padding: 3rem;
   position: relative;
   .todos {
     display: flex;
