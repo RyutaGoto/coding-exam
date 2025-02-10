@@ -1,7 +1,46 @@
 .todo {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  max-width: 250px;
+  display: grid;
+  grid-template-columns: 20px 1fr 110px;
+  gap: 8px;
   width: 100%;
+  .checkbox {
+    margin-top: 2px;
+  }
+  .title {
+    font-size: 16px;
+    margin-right: auto;
+  }
+  .buttons {
+    display: flex;
+    gap: 6px;
+    height: fit-content;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  .buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 24px;
+    width: 100%;
+    .submit {
+      background-color: #333;
+      color: #fff;
+      fill: #fff;
+      &:hover {
+        background-color: #111;
+      }
+      &:disabled {
+        background-color: rgba(150, 150, 150, 1);
+        color: #fff;
+        cursor: not-allowed;
+      }
+    }
+    button {
+      width: 100px;
+    }
+  }
 }
